@@ -20,6 +20,7 @@ class FamilyMember extends Model
         'phone_number',
         'occupation',
         'marital_status',
+        'relationship'
     ];
 
 

@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Interfaces\FamilyMemberRepositoryInterface;
-use app\Helpers\ResponseHelper;
+use App\Helpers\ResponseHelper;
 use App\Http\Resources\FamilyMemberResource;
 use App\Http\Resources\PaginateResource;
 
 class FamilyMemberController extends Controller
 {
     private FamilyMemberRepositoryInterface $familyMemberRepository;
+
     public function __construct(FamilyMemberRepositoryInterface $familyMemberRepository) {
         $this->familyMemberRepository = $familyMemberRepository;
     }
@@ -25,6 +26,16 @@ class FamilyMemberController extends Controller
                 $request->query('limit'),
                 true,
             );
+
+             // Cek jika data kosong
+        if ($familyMembers->isEmpty()) {
+            return ResponseHelper::jsonResponse(
+                false,
+                'Data Anggota Keluarga tidak ditemukan',
+                [],  // Kembalikan array kosong daripada null
+                200  // Gunakan 404 untuk indikasi data tidak ditemukan
+            );
+        }
 
             return ResponseHelper::jsonResponse(true,
             'Data Anggota Keluarga Berhasil diambil',

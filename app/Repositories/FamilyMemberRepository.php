@@ -25,7 +25,7 @@ class FamilyMemberRepository implements FamilyMemberRepositoryInterface
         }
         return $query;
     }
-    public function getAllpaginated(?string $search, int $rowPerPage)
+    public function getAllPaginated(?string $search, int $rowPerPage)
     {
         $query = $this->getAll($search, $rowPerPage, false);
 

@@ -7,6 +7,7 @@ use Database\Factories\HeadOfFamilyFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Factories\UserFactory;
+use Database\Factories\FamilyMemberFactory;
 class HeadOfFamilySeeder extends Seeder
 {
     /**
@@ -18,6 +19,11 @@ class HeadOfFamilySeeder extends Seeder
             HeadOfFamilyFactory::new()->create([
                 'user_id' => $user->id,
             ]);
+            FamilyMemberFactory::new()->count(3)->create([
+                'head_of_family_id' => $user->headOfFamily->id,
+                'user_id' => UserFactory::new()->create()->id,
+            ]);
         });
+
     }
 }
