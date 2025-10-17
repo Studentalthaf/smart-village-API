@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Interfaces\FamilyMemberRepositoryInterface;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\FamilyMemberStoreRequest;
 use App\Http\Resources\FamilyMemberResource;
 use App\Http\Resources\PaginateResource;
+use Illuminate\Support\Facades\Log;
 
 class FamilyMemberController extends Controller
 {
@@ -32,8 +34,8 @@ class FamilyMemberController extends Controller
             return ResponseHelper::jsonResponse(
                 false,
                 'Data Anggota Keluarga tidak ditemukan',
-                [],  // Kembalikan array kosong daripada null
-                200  // Gunakan 404 untuk indikasi data tidak ditemukan
+                [],  
+                404 
             );
         }
 
@@ -72,12 +74,27 @@ class FamilyMemberController extends Controller
         }
     }
 
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(FamilyMemberStoreRequest $request)
     {
-        //
+        try {
+            $validated = $request->validated();
+            
+            // Debug data yang diterima
+            Log::info('Data yang diterima:', $validated);
+            
+            $familyMember = $this->familyMemberRepository->create($validated);
+            return ResponseHelper::jsonResponse(true, 'Data Anggota Keluarga Berhasil Ditambahkan', new FamilyMemberResource($familyMember), 201);
+        } catch (\Exception $e) {
+            // Log error lengkap
+            Log::error('Error creating family member: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return ResponseHelper::jsonResponse(false, 'Data Anggota Keluarga Gagal Ditambahkan: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /**
@@ -85,7 +102,15 @@ class FamilyMemberController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $familyMember = $this->familyMemberRepository->getById($id);
+            if (!$familyMember) {
+                return ResponseHelper::jsonResponse(false, 'Anggota keluarga tidak ditemukan', null, 404);
+            }
+            return ResponseHelper::jsonResponse(true, 'Detail anggota keluarga Berhasil Diambil', new FamilyMemberResource($familyMember), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 500);
+        }
     }
 
     /**
